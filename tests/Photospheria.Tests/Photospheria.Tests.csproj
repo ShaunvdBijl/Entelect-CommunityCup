@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\src\Photospheria.Core\Photospheria.Core.csproj" />
     <ProjectReference Include="..\..\src\Photospheria.Serialization\Photospheria.Serialization.csproj" />
     <ProjectReference Include="..\..\src\Photospheria.Solver\Photospheria.Solver.csproj" />
+    <ProjectReference Include="..\..\level4\Level4Solver\Level4Solver.csproj" />
   </ItemGroup>
 
 </Project>

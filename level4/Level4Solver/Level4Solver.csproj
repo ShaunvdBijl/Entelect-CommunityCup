@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>EntelectHackathon.Level4</RootNamespace>
+    <AssemblyName>EntelectHackathon.Level4</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="*.json" CopyToOutputDirectory="PreserveNewest" />
+    <InternalsVisibleTo Include="Photospheria.Tests" />
+  </ItemGroup>
+</Project>

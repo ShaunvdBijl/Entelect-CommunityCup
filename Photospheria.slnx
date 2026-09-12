@@ -1,4 +1,13 @@
 <Solution>
+  <Folder Name="/level2/">
+    <Project Path="level2/RootCause.csproj" />
+  </Folder>
+  <Folder Name="/level3/">
+    <Project Path="Level3/Level3.csproj" />
+  </Folder>
+  <Folder Name="/level4/">
+    <Project Path="level4/Level4Solver/Level4Solver.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Photospheria.Cli/Photospheria.Cli.csproj" />
     <Project Path="src/Photospheria.Core/Photospheria.Core.csproj" />
