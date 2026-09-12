@@ -83,135 +83,38 @@ internal sealed class L3Solver
         return CollectionsMarshal.AsSpan(batch);
     }
 
-    private void FillTechPhase(int tick, List<L3Planting> batch)
+   private void FillTechPhase(int tick, List<L3Planting> batch)
+{
+    int remaining = 20 - batch.Count;
+
+    // Refresh living foundation nursery every 80 ticks to prevent fauna despawn
+    if (tick % 80 == 0 && tick < 360)
     {
-        int remaining = 20 - batch.Count;
-
-        if (tick < 8)
-        {
-            Seed(Oak, ref remaining, batch, 0, 18, stride: 4);
-        }
-
-        if (_engine.SpeciesCount(Grass) < TargetCount(0.08) || tick < 12)
-        {
-            Seed(Grass, ref remaining, batch, 40, 110, stride: 3);
-        }
-
-        if (_engine.SpeciesCount(Rose) < 24)
-        {
-            Seed(Rose, ref remaining, batch, 110, 140, stride: 4);
-        }
-
-        if (_engine.SpeciesCount(Lavender) < 24)
-        {
-            Seed(Lavender, ref remaining, batch, 18, 40, stride: 4);
-        }
-
-        if (_engine.SpeciesCount(Sunflower) < 30)
-        {
-            Seed(Sunflower, ref remaining, batch, 110, 150, stride: 5);
-        }
-
-        if (_engine.IsUnlocked(CrystalCactus) && _engine.SpeciesCount(CrystalCactus) < TargetCount(0.03))
-        {
-            Seed(CrystalCactus, ref remaining, batch, 70, 100, stride: 4);
-        }
-
-        if (_engine.IsUnlocked(BlueMoss) && _engine.SpeciesCount(BlueMoss) < TargetCount(0.06))
-        {
-            Seed(BlueMoss, ref remaining, batch, 50, 90, stride: 4);
-        }
-
-        if (_engine.IsUnlocked(Crimson) && _engine.SpeciesCount(Crimson) < TargetCount(0.05))
-        {
-            Seed(Crimson, ref remaining, batch, 90, 110, stride: 3);
-        }
-
-        if (_engine.IsUnlocked(StoneReed) && _engine.SpeciesCount(StoneReed) < 80)
-        {
-            SeedSpecial(StoneReed, ref remaining, batch, rockPath: true, water: false, burnt: false);
-        }
-
-        if (_engine.IsUnlocked(MireBloom) && _engine.SpeciesCount(MireBloom) < 80)
-        {
-            SeedSpecial(MireBloom, ref remaining, batch, rockPath: false, water: true, burnt: false);
-        }
-
-        if (_engine.IsUnlocked(Glowcap) && _engine.SpeciesCount(Glowcap) < TargetCount(0.05))
-        {
-            Seed(Glowcap, ref remaining, batch, 40, 80, stride: 3);
-        }
-
-        if (_engine.IsUnlocked(SilverFern) && _engine.SpeciesCount(SilverFern) < TargetCount(0.06))
-        {
-            Seed(SilverFern, ref remaining, batch, 20, 50, stride: 4);
-        }
-
-        if (_engine.IsUnlocked(PurpleCanopy) && _engine.SpeciesCount(PurpleCanopy) < 12)
-        {
-            Seed(PurpleCanopy, ref remaining, batch, 0, 22, stride: 5);
-        }
-
-        if (_engine.IsUnlocked(Whiteveil) && _engine.SpeciesCount(Whiteveil) < TargetCount(0.055))
-        {
-            Seed(Whiteveil, ref remaining, batch, 40, 70, stride: 3);
-        }
-
-        if (_engine.IsUnlocked(Moonpetal) && _engine.SpeciesCount(Moonpetal) < TargetCount(0.04))
-        {
-            Seed(Moonpetal, ref remaining, batch, 0, 24, stride: 3);
-        }
-
-        if (_engine.IsUnlocked(Orange) && _engine.SpeciesCount(Orange) < TargetCount(0.03))
-        {
-            Seed(Orange, ref remaining, batch, 100, 130, stride: 4);
-        }
-
-        if (_engine.IsUnlocked(Emberroot) && _engine.SpeciesCount(Emberroot) < 48)
-        {
-            Seed(Emberroot, ref remaining, batch, 24, 60, stride: 4);
-        }
-
-        if (_engine.IsUnlocked(Ashroot) && _engine.SpeciesCount(Ashroot) < TargetCount(0.045))
-        {
-            SeedSpecial(Ashroot, ref remaining, batch, rockPath: false, water: false, burnt: true);
-        }
-
-        if (_engine.IsUnlocked(Phoenix) && _engine.SpeciesCount(Phoenix) < TargetCount(0.03))
-        {
-            Seed(Phoenix, ref remaining, batch, 24, 70, stride: 4);
-        }
-
-        if (_engine.IsUnlocked(Razorgrass) && _engine.SpeciesCount(Razorgrass) < TargetCount(0.03))
-        {
-            Seed(Razorgrass, ref remaining, batch, 80, 110, stride: 4);
-        }
-
-        if (_engine.IsUnlocked(Skyvine) && _engine.SpeciesCount(Skyvine) < 40)
-        {
-            Seed(Skyvine, ref remaining, batch, 60, 90, stride: 4);
-        }
-
-        if (_engine.IsUnlocked(Ironthorn) && _engine.SpeciesCount(Ironthorn) < TargetCount(0.05))
-        {
-            Seed(Ironthorn, ref remaining, batch, 110, 140, stride: 4);
-        }
-
-        if (_engine.IsUnlocked(AmberFern) && _engine.SpeciesCount(AmberFern) < TargetCount(0.03))
-        {
-            Seed(AmberFern, ref remaining, batch, 20, 50, stride: 5);
-        }
-
-        if (_engine.IsUnlocked(GhostOrchid) && _engine.SpeciesCount(GhostOrchid) < TargetCount(0.02))
-        {
-            Seed(GhostOrchid, ref remaining, batch, 0, 24, stride: 4);
-        }
-
-        if (remaining > 0 && tick < 40)
-        {
-            Seed(Grass, ref remaining, batch, 40, 120, stride: 2);
-        }
+        Seed(Rose, ref remaining, batch, 110, 140, stride: 2);
+        Seed(Lavender, ref remaining, batch, 18, 40, stride: 2);
+        Seed(Grass, ref remaining, batch, 40, 110, stride: 2);
     }
+
+    if (tick < 8) Seed(Oak, ref remaining, batch, 0, 18, stride: 4);
+
+    if (_engine.IsUnlocked(CrystalCactus) && _engine.SpeciesCount(CrystalCactus) < TargetCount(0.03))
+        Seed(CrystalCactus, ref remaining, batch, 70, 100, stride: 4);
+
+    if (_engine.IsUnlocked(BlueMoss) && _engine.SpeciesCount(BlueMoss) < TargetCount(0.06))
+        Seed(BlueMoss, ref remaining, batch, 50, 90, stride: 4);
+
+    if (_engine.IsUnlocked(Crimson) && _engine.SpeciesCount(Crimson) < TargetCount(0.05))
+        Seed(Crimson, ref remaining, batch, 90, 110, stride: 4);
+
+    if (_engine.IsUnlocked(StoneReed) && _engine.SpeciesCount(StoneReed) < 80)
+        SeedSpecial(StoneReed, ref remaining, batch, rockPath: true, water: false, burnt: false);
+
+    if (_engine.IsUnlocked(MireBloom) && _engine.SpeciesCount(MireBloom) < 80)
+        SeedSpecial(MireBloom, ref remaining, batch, rockPath: false, water: true, burnt: false);
+
+    if (_engine.IsUnlocked(SilverFern) && _engine.SpeciesCount(SilverFern) < TargetCount(0.06))
+        Seed(SilverFern, ref remaining, batch, 20, 50, stride: 4);
+}
 
     private void FillAssemblyPhase(int tick, List<L3Planting> batch)
     {
@@ -299,29 +202,33 @@ internal sealed class L3Solver
 
     private int TargetCount(double coverage) => Math.Max(1, (int)(_engine.TotalCells * coverage));
 
-    private int Seed(byte plant, ref int remaining, List<L3Planting> batch, int colLo, int colHi, int stride)
+   private int Seed(byte plant, ref int remaining, List<L3Planting> batch, int colLo, int colHi, int stride)
+{
+    if (remaining <= 0 || !_engine.IsUnlocked(plant)) return 0;
+    int planted = 0;
+    int guard = 0;
+
+    while (remaining > 0 && planted < 20 && guard++ < _engine.TotalCells)
     {
-        if (remaining <= 0 || !_engine.IsUnlocked(plant)) return 0;
-        int planted = 0;
-        int guard = 0;
-        while (remaining > 0 && planted < 20 && guard++ < _engine.TotalCells)
-        {
-            int idx = _engine.FindEmpty(plant, colLo, colHi);
-            if (idx < 0) break;
-            int r = idx / _engine.Cols;
-            int c = idx - r * _engine.Cols;
-            if (stride > 1 && ((r + c) % stride != 0) && planted > 0)
-            {
-                continue;
-            }
+        int idx = _engine.FindEmpty(plant, colLo, colHi);
+        if (idx < 0) break;
+        int r = idx / _engine.Cols;
+        int c = idx - r * _engine.Cols;
 
-            batch.Add(new L3Planting(_engine.Tick, r, c, plant));
-            remaining--;
-            planted++;
-        }
+        // CRITICAL FIX: Ensure cell is not occupied by natural spread OR duplicate in current batch
+        if (_engine.Cell(r, c).Occupied || batch.Any(b => b.Row == r && b.Col == c))
+            continue;
 
-        return planted;
+        if (stride > 1 && ((r + c) % stride != 0) && planted > 0)
+            continue;
+
+        batch.Add(new L3Planting(_engine.Tick, r, c, plant));
+        remaining--;
+        planted++;
     }
+
+    return planted;
+}
 
     private int SeedSpecial(byte plant, ref int remaining, List<L3Planting> batch, bool rockPath, bool water, bool burnt)
     {

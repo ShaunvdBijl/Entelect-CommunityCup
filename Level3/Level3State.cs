@@ -567,7 +567,7 @@ internal sealed class L3Engine
             if (cell.Occupied)
             {
                 var def = Config.PlantsByIndex[cell.PlantIndex];
-                int drain = (cell.DeadMatter && (cell.Age % 2 != 0)) ? 0 : 1;
+                int drain = 1;
                 if (def.Has(L3PlantFlags.NutrientRegen) || _animals.Contains("Loamcrawlers"))
                 {
                     if (def.Has(L3PlantFlags.NutrientRegen)) drain = 0;
@@ -644,14 +644,19 @@ internal sealed class L3Engine
             case L3UnlockKind.Count:
                 return L3Loader.Compare(CountOf(node), node.Op, node.Value);
             case L3UnlockKind.FeatureCount:
-                double feat = node.Key.Contains("dead")
-                    ? (node.Value <= 1.0 ? (double)_deadMatterCount / TotalCells : _deadMatterCount)
-                    : node.Key.Contains("burnt")
-                        ? (node.Value <= 1.0 && node.Op != ">=" ? (double)_burntCount / TotalCells : _burntCount)
-                        : 0;
-                if (node.Key.Contains("burnt") && node.Value >= 1) feat = _burntCount;
-                if (node.Key.Contains("dead") && node.Value <= 1.0) feat = (double)_deadMatterCount / TotalCells;
-                return L3Loader.Compare(feat, node.Op, node.Value);
+                {
+                    double feat = 0;
+                    string keyLower = node.Key.ToLowerInvariant();
+                    if (keyLower.Contains("dead"))
+                    {
+                        feat = node.Value <= 1.0 ? (double)_deadMatterCount / TotalCells : _deadMatterCount;
+                    }
+                    else if (keyLower.Contains("burnt"))
+                    {
+                        feat = node.Value <= 1.0 ? (double)_burntCount / TotalCells : _burntCount;
+                    }
+                    return L3Loader.Compare(feat, node.Op, node.Value);
+                }
             default:
                 return true;
         }
@@ -677,14 +682,15 @@ internal sealed class L3Engine
         int sum = 0;
         foreach (var part in node.Key.Split('|'))
         {
-            if (Config.NameToIndex.TryGetValue(part, out byte idx))
+            string trimmed = part.Trim();
+            if (Config.NameToIndex.TryGetValue(trimmed, out byte idx))
             {
                 sum += _speciesCounts[idx];
                 continue;
             }
 
-            if (Config.Groups.TryGetValue(part, out var group) ||
-                Config.Groups.TryGetValue(L3Loader.NormalizeKey(part), out group))
+            if (Config.Groups.TryGetValue(trimmed, out var group) ||
+                Config.Groups.TryGetValue(L3Loader.NormalizeKey(trimmed), out group))
             {
                 foreach (byte g in group) sum += _speciesCounts[g];
             }

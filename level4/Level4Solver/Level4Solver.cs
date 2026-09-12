@@ -92,47 +92,48 @@ internal sealed class L4Solver
     }
 
     public List<L4Planting> GeneratePlan()
+{
+    _plan.Clear();
+    Array.Clear(_actionsPerTick);
+    _engine.Reset();
+
+    var batch = new List<L4Planting>(20);
+    int tEnd = _engine.TotalTicks;
+    int assemblyStart = Math.Max(0, tEnd - 90);
+
+    var usedThisTick = new HashSet<(int r, int c)>();
+
+    for (int tick = 0; tick < tEnd; tick++)
     {
-        _plan.Clear();
-        Array.Clear(_actionsPerTick);
-        _engine.Reset();
+        batch.Clear();
+        usedThisTick.Clear();
 
-        var batch = new List<L4Planting>(20);
-        int tEnd = _engine.TotalTicks;
+        if (tick < assemblyStart)
+            FillTechPhase(tick, batch);
+        else
+            FillAssemblyPhase(tick, batch);
 
-        for (int tick = 0; tick < tEnd; tick++)
+        // Filter out any duplicate coordinates within the same batch
+        for (int i = batch.Count - 1; i >= 0; i--)
         {
-            batch.Clear();
-
-            int unlockedCount = 0;
-            for (int u = 1; u < 32; u++) if (_engine.IsUnlocked((byte)u)) unlockedCount++;
-
-            if (unlockedCount < 31 && tick < 580)
+            var p = batch[i];
+            if (!usedThisTick.Add((p.Row, p.Col)) || _engine.Cell(p.Row, p.Col).Occupied)
             {
-                FillTechPhase(tick, batch);
+                batch.RemoveAt(i);
             }
-            else
-            {
-                FillAssemblyPhase(tick, batch);
-            }
-
-            foreach (var a in batch)
-            {
-                _plan.Add(a);
-                _actionsPerTick[tick]++;
-            }
-
-            if (tick < 20 || tick % 50 == 0 || tick == tEnd - 1)
-            {
-                var speciesSummary = string.Join(" ", batch.GroupBy(b => b.PlantIndex).Select(g => $"{_cfg.PlantsByIndex[g.Key].Name.Split(' ')[0]}:{g.Count()}"));
-                Console.WriteLine($"Tick {tick,3}: Unl={unlockedCount,2} Dead={_engine.DeadMatterCount,5} Burnt={_engine.BurntCount,4} Grass={_engine.SpeciesCount(Grass),5} Rose={_engine.SpeciesCount(Rose),5} Crim={_engine.SpeciesCount(Crimson),5} Moss={_engine.SpeciesCount(BlueMoss),4} Fern={_engine.SpeciesCount(SilverFern),4} Glow={_engine.SpeciesCount(Glowcap),4} White={_engine.SpeciesCount(Whiteveil),4} Purple={_engine.SpeciesCount(PurpleCanopy),2} | Actions: {speciesSummary}");
-            }
-
-            _engine.Step(CollectionsMarshal.AsSpan(batch));
         }
 
-        return _plan;
+        foreach (var a in batch)
+        {
+            _plan.Add(a);
+            _actionsPerTick[tick]++;
+        }
+
+        _engine.Step(CollectionsMarshal.AsSpan(batch));
     }
+
+    return _plan;
+}
 
     private static bool CanReplaceGrass(byte p) => p == Grass;
 
