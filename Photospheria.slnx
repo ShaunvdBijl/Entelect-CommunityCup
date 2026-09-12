@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Photospheria.Cli/Photospheria.Cli.csproj" />
+    <Project Path="src/Photospheria.Core/Photospheria.Core.csproj" />
+    <Project Path="src/Photospheria.Serialization/Photospheria.Serialization.csproj" />
+    <Project Path="src/Photospheria.Solver/Photospheria.Solver.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Photospheria.Tests/Photospheria.Tests.csproj" />
+  </Folder>
+</Solution>
