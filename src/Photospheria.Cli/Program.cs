@@ -55,6 +55,19 @@ public class Program
             }
         }
 
+        if (string.IsNullOrEmpty(levelPath))
+        {
+            string[] defaultCandidates = ["1 (1).json", "1.json", "level1.json"];
+            foreach (var candidate in defaultCandidates)
+            {
+                if (File.Exists(candidate))
+                {
+                    levelPath = candidate;
+                    break;
+                }
+            }
+        }
+
         SimulationConfig config;
         if (!string.IsNullOrEmpty(levelPath) && File.Exists(levelPath))
         {

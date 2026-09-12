@@ -43,23 +43,55 @@ public class MacroZoningSolver
             }
         }
 
+        bool usePriming = totalTicks >= 300;
+
         // Staggered planting start ticks based on species maturity and spread velocity:
-        // Oak Tree (maturity 20, spread 7): slowest, start earliest
-        // Rose Bush (maturity 10, spread 2 row): needs horizontal runway
-        // Lavender (maturity 4, spread 3): medium
-        // Dwarf Sunflower (maturity 5, spread 4): medium
-        // Grass (maturity 1, spread 2 vonNeumann): hyper-aggressive, start late so it doesn't flood other sectors
-        var startOffsets = new Dictionary<byte, int>
-        {
-            [Level1Catalogue.OakTreeIndex] = Math.Min(85, totalTicks - 25),
-            [Level1Catalogue.RoseBushIndex] = Math.Min(75, totalTicks - 25),
-            [Level1Catalogue.LavenderIndex] = Math.Min(60, totalTicks - 20),
-            [Level1Catalogue.SunflowerIndex] = Math.Min(50, totalTicks - 20),
-            [Level1Catalogue.GrassIndex] = Math.Min(22, totalTicks - 5)
-        };
+        // When priming is enabled, terminal plants survive twice as long on dead matter soil!
+        var startOffsets = usePriming
+            ? new Dictionary<byte, int>
+            {
+                [Level1Catalogue.OakTreeIndex] = Math.Min(180, totalTicks - 50),
+                [Level1Catalogue.RoseBushIndex] = Math.Min(165, totalTicks - 50),
+                [Level1Catalogue.LavenderIndex] = Math.Min(140, totalTicks - 40),
+                [Level1Catalogue.SunflowerIndex] = Math.Min(130, totalTicks - 40),
+                [Level1Catalogue.GrassIndex] = Math.Min(30, totalTicks - 10)
+            }
+            : new Dictionary<byte, int>
+            {
+                [Level1Catalogue.OakTreeIndex] = Math.Min(85, totalTicks - 25),
+                [Level1Catalogue.RoseBushIndex] = Math.Min(75, totalTicks - 25),
+                [Level1Catalogue.LavenderIndex] = Math.Min(60, totalTicks - 20),
+                [Level1Catalogue.SunflowerIndex] = Math.Min(50, totalTicks - 20),
+                [Level1Catalogue.GrassIndex] = Math.Min(22, totalTicks - 5)
+            };
 
         var scheduledActions = new List<PlantingAction>();
         var actionsPerTick = new int[totalTicks];
+
+        // 1. Soil Priming Phase (ADR-0002):
+        // Plant sacrificial Grass early so it starves by tick 100, leaving dead matter.
+        // Soil regenerates from tick 100 to 200, allowing terminal crops to consume 0.5/tick!
+        if (usePriming)
+        {
+            int primeTick = 0;
+            for (int r = 1; r < height - 1; r += 4)
+            {
+                for (int c = 1; c < width - 1; c += 4)
+                {
+                    if (_config.TerrainMap != null && _config.TerrainMap[r, c] != 0) continue;
+                    if (_config.SoilMap != null && _config.SoilMap[r, c] > 1) continue;
+
+                    while (primeTick < 10 && actionsPerTick[primeTick] >= 20)
+                    {
+                        primeTick++;
+                    }
+                    if (primeTick >= 10) break;
+
+                    scheduledActions.Add(new PlantingAction(primeTick, r, c, Level1Catalogue.GrassIndex));
+                    actionsPerTick[primeTick]++;
+                }
+            }
+        }
 
         // 1. Initial Staggered Seeding per Sector
         foreach (var species in Level1Catalogue.WhitelistIndices)
